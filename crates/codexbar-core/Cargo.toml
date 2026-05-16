@@ -11,6 +11,10 @@ description = "Headless core of CodexBar Linux — providers, cost scanner, sett
 [lib]
 path = "src/lib.rs"
 
+[[bin]]
+name = "codexbar"
+path = "src/bin/codexbar.rs"
+
 [features]
 default = []
 

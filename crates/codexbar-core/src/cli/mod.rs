@@ -145,7 +145,7 @@ mod tests {
     use clap::CommandFactory;
 
     #[test]
-    fn top_level_help_mentions_nanogpt_provider() {
+    fn top_level_help_mentions_openrouter_provider() {
         let mut command = Cli::command();
         let mut output = Vec::new();
         command
@@ -153,11 +153,11 @@ mod tests {
             .expect("top-level help should render");
 
         let help = String::from_utf8(output).expect("help should be valid utf-8");
-        assert!(help.contains("nanogpt"));
+        assert!(help.contains("openrouter"));
     }
 
     #[test]
-    fn usage_subcommand_help_mentions_nanogpt_provider() {
+    fn usage_subcommand_help_mentions_openrouter_provider() {
         let mut command = Cli::command();
         let usage = command
             .find_subcommand_mut("usage")
@@ -168,6 +168,6 @@ mod tests {
             .expect("usage help should render");
 
         let help = String::from_utf8(output).expect("help should be valid utf-8");
-        assert!(help.contains("nanogpt"));
+        assert!(help.contains("openrouter"));
     }
 }
