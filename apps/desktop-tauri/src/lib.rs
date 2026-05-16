@@ -43,7 +43,7 @@ const ALPHA_PROVIDERS: &[ProviderId] = &[
     ProviderId::Codex,
     ProviderId::Claude,
     ProviderId::Copilot,
-    ProviderId::OpenAiApi,
+    ProviderId::OpenAIApi,
     ProviderId::OpenRouter,
 ];
 
