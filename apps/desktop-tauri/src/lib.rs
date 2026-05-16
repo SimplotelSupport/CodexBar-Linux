@@ -102,14 +102,87 @@ async fn fetch_one(id: ProviderId) -> ProviderRow {
 }
 
 async fn fetch_all() -> UsageSnapshot {
-    let mut rows = Vec::with_capacity(ALPHA_PROVIDERS.len());
-    for id in ALPHA_PROVIDERS {
-        rows.push(fetch_one(*id).await);
-    }
+    use futures::future::join_all;
+    let rows = join_all(ALPHA_PROVIDERS.iter().copied().map(fetch_one)).await;
     UsageSnapshot {
         fetched_at: chrono_now(),
         providers: rows,
     }
+}
+
+/// Drives all providers in parallel and emits a `usage-updated` event after
+/// every individual fetch completes — so the popover fills row-by-row
+/// instead of waiting for the slowest provider.
+async fn fetch_all_streaming(app: AppHandle) -> UsageSnapshot {
+    use futures::future::join_all;
+    use std::sync::Arc;
+
+    // Seed the UI with placeholder rows (so it stops saying "Loading…")
+    let placeholder_rows: Vec<ProviderRow> = ALPHA_PROVIDERS
+        .iter()
+        .map(|id| {
+            let meta = instantiate_provider(*id).metadata().clone();
+            ProviderRow {
+                id: id.cli_name().to_string(),
+                display_name: id.display_name().to_string(),
+                source: "loading…".to_string(),
+                account_email: None,
+                login_method: None,
+                primary_label: meta.session_label.to_string(),
+                primary_pct: 0.0,
+                primary_reset: None,
+                secondary_label: None,
+                secondary_pct: None,
+                secondary_reset: None,
+                cost_used: None,
+                cost_limit: None,
+                cost_period: None,
+                error: None,
+            }
+        })
+        .collect();
+    let acc = Arc::new(Mutex::new(placeholder_rows));
+    let _ = app.emit(
+        "usage-updated",
+        &UsageSnapshot {
+            fetched_at: chrono_now(),
+            providers: acc.lock().unwrap().clone(),
+        },
+    );
+
+    let futs = ALPHA_PROVIDERS
+        .iter()
+        .copied()
+        .enumerate()
+        .map(|(idx, id)| {
+            let app = app.clone();
+            let acc = Arc::clone(&acc);
+            async move {
+                let row = fetch_one(id).await;
+                {
+                    let mut guard = acc.lock().unwrap();
+                    guard[idx] = row.clone();
+                }
+                let snap = UsageSnapshot {
+                    fetched_at: chrono_now(),
+                    providers: acc.lock().unwrap().clone(),
+                };
+                let _ = app.emit("usage-updated", &snap);
+                row
+            }
+        });
+    let _ = join_all(futs).await;
+
+    let final_snap = UsageSnapshot {
+        fetched_at: chrono_now(),
+        providers: acc.lock().unwrap().clone(),
+    };
+    if let Some(state) = app.try_state::<AppState>()
+        && let Ok(mut g) = state.last_snapshot.lock()
+    {
+        *g = Some(final_snap.clone());
+    }
+    final_snap
 }
 
 fn chrono_now() -> String {
@@ -123,14 +196,7 @@ fn chrono_now() -> String {
 
 #[tauri::command]
 async fn refresh_usage(app: AppHandle) -> Result<UsageSnapshot, String> {
-    let snap = fetch_all().await;
-    if let Some(state) = app.try_state::<AppState>() {
-        if let Ok(mut guard) = state.last_snapshot.lock() {
-            *guard = Some(snap.clone());
-        }
-    }
-    let _ = app.emit("usage-updated", &snap);
-    Ok(snap)
+    Ok(fetch_all_streaming(app).await)
 }
 
 #[tauri::command]
@@ -202,9 +268,10 @@ fn build_tray(app: &AppHandle) -> tauri::Result<()> {
 fn spawn_poller(app: AppHandle) {
     tauri::async_runtime::spawn(async move {
         let mut ticker = tokio::time::interval(Duration::from_secs(120));
+        ticker.set_missed_tick_behavior(tokio::time::MissedTickBehavior::Skip);
         loop {
             ticker.tick().await;
-            let _ = refresh_usage(app.clone()).await;
+            let _ = fetch_all_streaming(app.clone()).await;
         }
     });
 }
