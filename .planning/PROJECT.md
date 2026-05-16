@@ -2,7 +2,9 @@
 
 ## What This Is
 
-CodexBar Linux is a native Linux/Ubuntu port of [steipete/CodexBar](https://github.com/steipete/CodexBar) (macOS menubar) and [Finesssee/Win-CodexBar](https://github.com/Finesssee/Win-CodexBar) (Windows system tray). It is a system-tray application that surfaces real-time AI coding-provider usage limits, quota reset countdowns, and cumulative cost across 30+ providers (Codex, Claude, Cursor, Gemini, Copilot, OpenRouter, etc.) so developers can see exactly how much of their AI budget remains without opening a browser.
+CodexBar Linux is a native Linux/Ubuntu port of [steipete/CodexBar](https://github.com/steipete/CodexBar) (macOS menubar) and [Finesssee/Win-CodexBar](https://github.com/Finesssee/Win-CodexBar) (Windows system tray). It is a system-tray application that surfaces real-time AI coding-provider usage limits, quota reset countdowns, and cumulative cost so developers can see exactly how much of their AI budget remains without opening a browser.
+
+**Alpha (v0.1.0) ships with 5 providers**: Codex, Claude, OpenAI, Anthropic, OpenRouter. The other 36 providers in the upstream Win-CodexBar crate are deferred to v2 once the trait surface is hardened.
 
 ## Core Value
 
@@ -69,6 +71,9 @@ A glanceable Linux tray indicator that tells a developer *right now* how much of
 | Decision | Rationale | Outcome |
 |----------|-----------|---------|
 | Use Tauri v2 + Rust (not Electron, not native GTK4) | Reuses Windows port's Rust backend crate; ~100 MB lighter than Electron; first-class Tauri Linux support; same frontend can run all 3 OSes | — Pending validation in Phase 1 |
+| **Selectively vendor headless modules from Win-CodexBar (not fork-and-feature-gate)** | Win-CodexBar's `codexbar` crate has GUI deps as unconditional `[dependencies]` (winit, eframe, tray-icon, muda, global-hotkey, keyring, aes-gcm). Feature-gating means modifying upstream; selective vendor = delete what we don't need, keep MIT attribution, zero GUI baggage. Cleaner than carrying a fork in lockstep. | — Locked 2026-05-17 |
+| **Alpha (v0.1.0) scope: 5 providers** — Codex, Claude, OpenAI CLI, Anthropic API (via `openaiapi/` shape), OpenRouter | Codex + Claude exercise the JSONL cost scanner; the other 3 exercise clean HTTP+rustls. 41 providers in v1 is fantasy; rest are tracked as v2. Forces every cross-cutting concern (auth, errors, parsing) through 5 distinct shapes, which is enough to harden the trait | — Locked 2026-05-17 |
+| MIT attribution preserved | Win-CodexBar is MIT-licensed; vendored source must retain original LICENSE alongside it (`crates/codexbar-core/LICENSE-WIN-CODEXBAR`) + top-level NOTICE crediting upstream | — Locked 2026-05-17 |
 | Target Ubuntu 22.04 LTS + Debian 12 as v1 baseline | Covers ~80% of dev-Linux desktops; matches webkitgtk 6.0 floor; older distros routed to AppImage | — Pending |
 | `.deb` + AppImage for v1; Flatpak deferred | apt is idiomatic on Ubuntu; AppImage covers everything else; Flatpak adds portal/sandbox engineering cost we cannot absorb in v1 | — Pending |
 | Secret Service API for credentials, encrypted-file fallback | Standard freedesktop spec; works on GNOME Keyring + KWallet; encrypted fallback covers headless / unsupported sessions | — Pending |

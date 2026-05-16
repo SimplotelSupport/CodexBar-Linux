@@ -7,29 +7,26 @@
 
 Requirements for the initial public release on Ubuntu 22.04 LTS / Debian 12 / Fedora 39+ / Arch.
 
-### Core Backend (`codexbar` Rust crate, reused from Win-CodexBar)
+### Core Backend (`codexbar-core` — selectively vendored from Win-CodexBar `rust/`)
 
-- [ ] **CORE-01**: `codexbar` crate compiles cleanly on `x86_64-unknown-linux-gnu` with all GUI dependencies (eframe/egui/winit/tray-icon/muda/global-hotkey) feature-gated off by default
-- [ ] **CORE-02**: `codexbar` crate has no `winit` or `tray-icon` in its dependency tree when built with default features (verified via `cargo tree`)
-- [ ] **CORE-03**: `reqwest` is configured with `rustls-tls` and `default-features = false` to avoid OpenSSL ABI drift
+- [ ] **CORE-01**: `codexbar-core` crate vendors only headless modules from Win-CodexBar (`core/`, `providers/{codex,claude,openai,openaiapi,openrouter}/`, `cli/`, `cost_scanner.rs`, `secure_file.rs`, `settings.rs`, `logging.rs`); GUI/Windows-specific modules (`tray/`, `host/`, `browser/`, `notifications.rs`, `sound.rs`, `wsl.rs`, `login.rs`, `updater.rs`, `shortcuts.rs`) are NOT vendored
+- [ ] **CORE-02**: `codexbar-core` Cargo.toml has zero GUI/Windows dependencies; `cargo build -p codexbar-core` succeeds on `x86_64-unknown-linux-gnu` with default features (no feature flags required); `cargo tree -p codexbar-core` shows no `winit`, `eframe`, `egui`, `tray-icon`, `muda`, `global-hotkey`, `keyring`, `aes-gcm`, `winreg`, `windows` (the crate)
+- [ ] **CORE-03**: `reqwest` is configured with `rustls-tls` and `default-features = false` to avoid OpenSSL ABI drift; vendored crate must not link `native-tls` or `openssl-sys`
 - [ ] **CORE-04**: `codexbar-cli` crate produces a stand-alone CLI binary (`codexbar`) usable independently of the desktop shell
 - [ ] **CORE-05**: All XDG paths resolved via `directories::ProjectDirs` (config, cache, state directories follow XDG Base Directory spec)
 - [ ] **CORE-06**: Structured logging via `tracing` writes JSON to `$XDG_STATE_HOME/codexbar/logs/` with daily rotation and 7-day retention
 
-### Provider Plugins
+### Provider Plugins (alpha = 5 providers)
 
 - [ ] **PROV-01**: Codex provider plugin: HTTP usage query + local JSONL cost scan from `~/.codex/sessions/`
-- [ ] **PROV-02**: Claude provider plugin: HTTP usage + local JSONL cost scan from `~/.claude/conversations/`
-- [ ] **PROV-03**: Gemini provider plugin: HTTP usage query
-- [ ] **PROV-04**: GitHub Copilot provider plugin: HTTP usage query
-- [ ] **PROV-05**: OpenAI API provider plugin (raw API key path)
-- [ ] **PROV-06**: Anthropic API provider plugin (raw API key path)
-- [ ] **PROV-07**: OpenRouter provider plugin
-- [ ] **PROV-08**: Cursor provider plugin
-- [ ] **PROV-09**: Every provider plugin has a `serde::Deserialize`-typed response struct (no `serde_json::Value` parsing in the hot path)
-- [ ] **PROV-10**: Every provider plugin has at least one mockito-backed fixture test that fails when upstream response shape changes
-- [ ] **PROV-11**: Background poller respects per-provider `min_interval` and 429 `Retry-After` headers; exponential backoff with jitter on consecutive failures
-- [ ] **PROV-12**: Circuit breaker pauses a provider after 5 sequential failures until next manual refresh
+- [ ] **PROV-02**: Claude provider plugin: HTTP usage + local JSONL cost scan from `~/.claude/conversations/` (this covers the Anthropic CLI path)
+- [ ] **PROV-03**: OpenAI provider plugin (CLI / API key path)
+- [ ] **PROV-04**: Anthropic API provider plugin (raw API key path via `openaiapi/`-style shape)
+- [ ] **PROV-05**: OpenRouter provider plugin
+- [ ] **PROV-06**: Every provider plugin has a `serde::Deserialize`-typed response struct (no `serde_json::Value` parsing in the hot path)
+- [ ] **PROV-07**: Every provider plugin has at least one mockito-backed fixture test that fails when upstream response shape changes
+- [ ] **PROV-08**: Background poller respects per-provider `min_interval` and 429 `Retry-After` headers; exponential backoff with jitter on consecutive failures
+- [ ] **PROV-09**: Circuit breaker pauses a provider after 5 sequential failures until next manual refresh
 
 ### Tray UI (Tauri v2 + webkitgtk WebView)
 
@@ -97,6 +94,8 @@ Requirements for the initial public release on Ubuntu 22.04 LTS / Debian 12 / Fe
 
 | Category | Requirement |
 |----------|-------------|
+| Providers | Gemini, Copilot, Cursor (deferred from v1 — re-vendor from Win-CodexBar once trait surface is hardened) |
+| Providers | 33 additional providers in upstream Win-CodexBar (abacus, alibaba, amp, antigravity, augment, bedrock, codebuff, commandcode, crof, deepseek, doubao, factory, jetbrains, kilo, kimi, kimik2, kiro, manus, mimo, minimax, mistral, nanogpt, ollama, opencode, opencodego, perplexity, stepfun, synthetic, venice, vertexai, warp, windsurf, zai, infini) |
 | Distribution | Flatpak package using xdg-desktop-portals |
 | Distribution | Custom signed apt repo at `apt.codexbar.dev` |
 | Distribution | arm64 native builds for Ubuntu/Debian |
@@ -144,9 +143,6 @@ Requirements for the initial public release on Ubuntu 22.04 LTS / Debian 12 / Fe
 | PROV-07 | Phase 1 | Pending |
 | PROV-08 | Phase 1 | Pending |
 | PROV-09 | Phase 1 | Pending |
-| PROV-10 | Phase 1 | Pending |
-| PROV-11 | Phase 1 | Pending |
-| PROV-12 | Phase 1 | Pending |
 | CLI-01 | Phase 1 | Pending |
 | CLI-02 | Phase 1 | Pending |
 | CLI-03 | Phase 1 | Pending |
@@ -190,8 +186,8 @@ Requirements for the initial public release on Ubuntu 22.04 LTS / Debian 12 / Fe
 | DOC-04 | Phase 4 | Pending |
 
 **Coverage:**
-- v1 requirements: 59 total (corrected from initial 60 — count verified by enumeration)
-- Mapped to phases: 59/59
+- v1 requirements: 56 total (alpha scope tightened to 5 providers: PROV-* renumbered 01-09; 3 deferred to v2)
+- Mapped to phases: 56/56
 - Unmapped: 0
 
 ---

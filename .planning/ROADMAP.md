@@ -21,19 +21,21 @@ Decimal phases appear between their surrounding integers in numeric order.
 ## Phase Details
 
 ### Phase 0: PRD & Foundation
-**Goal**: Cargo workspace is correctly structured so `codexbar` crate compiles headlessly on Linux with zero GUI dependency conflicts
+**Goal**: Cargo workspace exists with `codexbar-core` selectively vendored from Win-CodexBar (headless modules + 5 alpha providers only); `cargo build` green on Linux with default features
 **Depends on**: Nothing (first phase)
 **Requirements**: CORE-01, CORE-02, CORE-03
 **Success Criteria** (what must be TRUE):
-  1. `cargo build -p codexbar --no-default-features` succeeds on `x86_64-unknown-linux-gnu` with no errors
-  2. `cargo tree -p codexbar --no-default-features | grep -E 'winit|tray-icon|eframe'` returns empty (zero GUI deps leaked)
-  3. `cargo build -p codexbar --no-default-features` dependency tree contains `rustls-tls` and no `openssl` crate
+  1. `cargo build -p codexbar-core` succeeds on `x86_64-unknown-linux-gnu` with default features (no feature-flag gymnastics)
+  2. `cargo tree -p codexbar-core` contains zero matches for `winit`, `eframe`, `egui`, `tray-icon`, `muda`, `global-hotkey`, `keyring`, `aes-gcm`, `winreg`, or the `windows` crate
+  3. `cargo tree -p codexbar-core` shows `rustls` and no `openssl-sys` or `native-tls`
+  4. `crates/codexbar-core/LICENSE-WIN-CODEXBAR` exists with the upstream MIT license verbatim; top-level `NOTICE` credits Win-CodexBar
+  5. `crates/codexbar-core/src/providers/` contains exactly: `codex`, `claude`, `openai`, `openaiapi`, `openrouter`, plus `mod.rs` — no other provider directories
 **Plans**: TBD
 
 ### Phase 1: Headless Core + CLI (Dev)
 **Goal**: All provider plugins compile and have passing fixture tests on Linux; the `codexbar` CLI binary works standalone on Linux
 **Depends on**: Phase 0
-**Requirements**: CORE-04, CORE-05, CORE-06, PROV-01, PROV-02, PROV-03, PROV-04, PROV-05, PROV-06, PROV-07, PROV-08, PROV-09, PROV-10, PROV-11, PROV-12, CLI-01, CLI-02, CLI-03, CLI-04, TEST-01
+**Requirements**: CORE-04, CORE-05, CORE-06, PROV-01, PROV-02, PROV-03, PROV-04, PROV-05, PROV-06, PROV-07, PROV-08, PROV-09, CLI-01, CLI-02, CLI-03, CLI-04, TEST-01
 **Success Criteria** (what must be TRUE):
   1. `cargo test -p codexbar` passes on Linux CI with all provider fixture tests green
   2. `codexbar usage -p codex` prints a JSON snapshot to stdout on a machine with `~/.codex/sessions/` logs
