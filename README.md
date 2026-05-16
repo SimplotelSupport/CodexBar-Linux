@@ -20,9 +20,12 @@ This first alpha ships the **headless `codexbar` CLI binary**. It validates the 
 ### Debian/Ubuntu (.deb)
 
 ```bash
-curl -L https://github.com/sidhartha1s/CodexBar-Linux/releases/download/v0.1.0-alpha/codexbar_0.1.0-alpha_amd64.deb -o codexbar.deb
+curl -L -o codexbar.deb \
+  https://github.com/sidhartha1s/CodexBar-Linux/releases/download/v0.1.0-alpha/codexbar_0.1.0-alpha-1_amd64.deb
 sudo dpkg -i codexbar.deb
 ```
+
+> cargo-deb appends a `-1` debian revision to the package filename. If you grab the URL from the Releases page directly, copy it verbatim.
 
 ### Tarball (any glibc-2.35+ Linux on amd64)
 
