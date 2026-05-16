@@ -1,0 +1,19 @@
+CodexBar Linux
+==============
+
+CodexBar Linux is a Linux/Ubuntu port of the AI provider usage monitor
+originally implemented for macOS as
+  steipete/CodexBar  (https://github.com/steipete/CodexBar)
+and ported to Windows as
+  Finesssee/Win-CodexBar  (https://github.com/Finesssee/Win-CodexBar).
+
+The Rust core in `crates/codexbar-core/` is a selective vendor of
+`Finesssee/Win-CodexBar`'s `rust/` crate. Only the headless modules
+(`core/`, `cli/`, `providers/{codex,claude,openai,openaiapi,openrouter}/`,
+`status/`, `cost_scanner.rs`, `secure_file.rs`, `settings.rs`,
+`logging.rs`) were copied. All Windows-specific and GUI modules were
+omitted.
+
+The upstream MIT LICENSE is preserved verbatim at
+`crates/codexbar-core/LICENSE-WIN-CODEXBAR`. CodexBar Linux is
+distributed under the same MIT terms (see `LICENSE` at repo root).

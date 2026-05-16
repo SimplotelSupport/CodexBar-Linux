@@ -1,0 +1,19 @@
+[workspace]
+resolver = "2"
+members = ["crates/codexbar-core"]
+
+[workspace.package]
+version = "0.1.0-alpha"
+edition = "2024"
+rust-version = "1.85"
+authors = ["sidhartha1s"]
+license = "MIT"
+repository = "https://github.com/sidhartha1s/CodexBar-Linux"
+description = "Linux/Ubuntu port of CodexBar: an AI provider usage/quota monitor"
+
+[profile.release]
+opt-level = 3
+lto = "thin"
+codegen-units = 1
+strip = true
+panic = "abort"

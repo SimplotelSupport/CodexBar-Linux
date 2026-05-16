@@ -1,0 +1,84 @@
+[package]
+name = "codexbar-core"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+authors.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "Headless core of CodexBar Linux — providers, cost scanner, settings, CLI plumbing."
+
+[lib]
+path = "src/lib.rs"
+
+[features]
+default = []
+
+[dependencies]
+# Async runtime
+tokio = { version = "1", features = ["rt-multi-thread", "macros", "time", "signal", "fs", "process", "io-util", "sync"] }
+
+# HTTP client (rustls only — no openssl/native-tls)
+reqwest = { version = "0.12", features = ["json", "cookies", "rustls-tls", "stream"], default-features = false }
+
+# Serialization
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+toml = "0.8"
+
+# CLI
+clap = { version = "4", features = ["derive", "env"] }
+
+# Logging
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter", "json"] }
+tracing-appender = "0.2"
+
+# Error handling
+thiserror = "2"
+anyhow = "1"
+
+# Date/time
+chrono = { version = "0.4", features = ["serde"] }
+
+# Async utilities
+async-trait = "0.1"
+futures = "0.3"
+
+# Hashing for update verification
+sha2 = "0.10"
+
+# Directory paths (XDG)
+directories = "6"
+
+# URL handling
+url = "2"
+
+# UUID generation
+uuid = { version = "1", features = ["v4", "serde"] }
+
+# Regex (lite)
+regex-lite = "0.1"
+
+# Find executables in PATH
+which = "7"
+
+# Pseudo-terminal for interactive CLI probes (codex/claude/gemini)
+portable-pty = "0.9"
+
+# Standard directories
+dirs = "6"
+
+# Open URLs in browser
+open = "5"
+
+# Base64
+base64 = "0.22"
+
+[build-dependencies]
+chrono = "0.4"
+
+[dev-dependencies]
+tokio-test = "0.4"
+tempfile = "3"
+mockito = "1.4"
