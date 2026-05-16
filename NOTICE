@@ -17,3 +17,7 @@ omitted.
 The upstream MIT LICENSE is preserved verbatim at
 `crates/codexbar-core/LICENSE-WIN-CODEXBAR`. CodexBar Linux is
 distributed under the same MIT terms (see `LICENSE` at repo root).
+
+The Tauri desktop shell at `apps/desktop-tauri/` is original code for
+this project: a thin Rust+JS layer that consumes the vendored core via
+the `codexbar-core` crate, with no source lifted from upstream.

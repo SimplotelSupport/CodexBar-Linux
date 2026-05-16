@@ -14,10 +14,10 @@ Decimal phases appear between their surrounding integers in numeric order.
 
 - [x] **Phase 0: PRD & Foundation** - Resolve Cargo feature-gate blocker; establish headless-on-Linux workspace
 - [x] **Phase 1: Headless Core + CLI (Dev)** - All 5 alpha providers compile and test green on Linux; CLI binary works standalone
-- [ ] **Phase 4-CLI: Ship v0.1.0-alpha (CLI-only)** - `.deb` + `.tar.gz` + SHA-256 built in CI; tagged GitHub Release shipped
-- [ ] **Phase 2 (v0.2.0): Tauri Shell + Tray** - App launches; tray visible on GNOME + KDE; popover opens
-- [ ] **Phase 3 (v0.2.0): Data Pipeline + Credentials** - Live usage data flows to popover; settings and Secret Service wired; CI integration tests green
-- [ ] **Phase 4-GUI (v0.2.0): GUI distribution** - AppImage + `.deb` GUI build; UAT complete; tagged v0.2.0 release shipped
+- [x] **Phase 4-CLI: Ship v0.1.0-alpha (CLI-only)** - `.deb` + `.tar.gz` + SHA-256 built in CI; tagged GitHub Release shipped
+- [ ] **Phase 2 (v0.2.0-alpha): Tauri Shell + Tray + Popover** - App launches into tray; popover renders live usage grid; background poller wired
+- [ ] **Phase 4-GUI (v0.2.0-alpha): GUI distribution** - `.deb` + AppImage built in CI; tagged v0.2.0-alpha release shipped
+- [ ] **Phase 3 (v0.3.0): Settings UI + Secret Service Credentials** - In-app credential editor; `oo7` Secret Service + encrypted-file fallback; CI integration tests green
 
 ## Phase Details
 

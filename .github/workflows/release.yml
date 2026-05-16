@@ -12,8 +12,8 @@ env:
   CARGO_TERM_COLOR: always
 
 jobs:
-  build:
-    name: build artifacts (ubuntu-22.04)
+  build-cli:
+    name: build CLI (.deb + .tar.gz)
     runs-on: ubuntu-22.04
     outputs:
       version: ${{ steps.version.outputs.version }}
@@ -36,17 +36,17 @@ jobs:
           echo "version=${VERSION}" >> "$GITHUB_OUTPUT"
           echo "Building release for ${VERSION}"
 
-      - name: cargo build --release
+      - name: cargo build --release -p codexbar-core
         run: cargo build --release -p codexbar-core
 
-      - name: Smoke test release binary
+      - name: Smoke test CLI release binary
         run: |
           ./target/release/codexbar --version
           ./target/release/codexbar --help | head -20
           ./target/release/codexbar usage --help | grep -q openrouter
 
-      - name: cargo test --release
-        run: cargo test --release --workspace
+      - name: cargo test --release -p codexbar-core
+        run: cargo test --release -p codexbar-core
 
       - name: Build .deb
         run: cargo deb -p codexbar-core --no-build --output target/debian/
@@ -75,24 +75,88 @@ jobs:
           done
           ls -la
 
-      - name: Upload artifacts (for inspection)
+      - name: Upload CLI artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: codexbar-linux-amd64
+          name: codexbar-cli-linux-amd64
+          path: artifacts/
+          if-no-files-found: error
+
+  build-desktop:
+    name: build Desktop (Tauri .deb + AppImage)
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Rust toolchain (stable)
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache cargo
+        uses: Swatinem/rust-cache@v2
+
+      - name: Install Tauri system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            libwebkit2gtk-4.1-dev \
+            libgtk-3-dev \
+            libayatana-appindicator3-dev \
+            librsvg2-dev \
+            libsoup-3.0-dev \
+            build-essential \
+            pkg-config \
+            libssl-dev \
+            file \
+            wget
+
+      - name: Install Tauri CLI
+        run: cargo install tauri-cli --locked --version ^2
+
+      - name: Build Tauri bundle (.deb + AppImage)
+        working-directory: apps/desktop-tauri
+        run: cargo tauri build --bundles deb appimage --verbose
+
+      - name: Collect desktop artifacts
+        run: |
+          set -euo pipefail
+          mkdir -p artifacts
+          # Tauri 2 outputs to target/release/bundle/{deb,appimage}/
+          for f in target/release/bundle/deb/*.deb target/release/bundle/appimage/*.AppImage; do
+            if [ -f "$f" ]; then
+              cp "$f" artifacts/
+            fi
+          done
+          cd artifacts
+          for f in *.deb *.AppImage; do
+            [ -f "$f" ] || continue
+            sha256sum "$f" > "${f}.sha256"
+          done
+          ls -la
+
+      - name: Upload desktop artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: codexbar-desktop-linux-amd64
           path: artifacts/
           if-no-files-found: error
 
   release:
     name: publish GitHub Release
-    needs: build
+    needs: [build-cli, build-desktop]
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v4
 
-      - name: Download artifacts
+      - name: Download CLI artifacts
         uses: actions/download-artifact@v4
         with:
-          name: codexbar-linux-amd64
+          name: codexbar-cli-linux-amd64
+          path: artifacts/
+
+      - name: Download desktop artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: codexbar-desktop-linux-amd64
           path: artifacts/
 
       - name: Publish release
@@ -105,6 +169,7 @@ jobs:
           if [[ "${TAG}" == *"-alpha"* || "${TAG}" == *"-beta"* || "${TAG}" == *"-rc"* ]]; then
             IS_PRE="--prerelease"
           fi
+          ls -la artifacts/
           gh release create "${TAG}" \
             --title "${TAG}" \
             --generate-notes \

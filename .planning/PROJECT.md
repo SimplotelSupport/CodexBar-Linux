@@ -16,31 +16,36 @@ A glanceable Linux tray indicator that tells a developer *right now* how much of
 
 (None yet — ship to validate)
 
-### Active (v0.1.0-alpha — CLI-only cut)
+### Validated (shipped in v0.1.0-alpha)
 
-- [ ] CLI subcommand `codexbar usage -p <provider>` and `codexbar cost -p <provider>` for scripting / CI
-- [ ] Codex CLI integration: spawn `codex` and parse local usage/cost from JSONL logs
-- [ ] Claude / Gemini CLI fallback integration (parity with macOS PTY runner)
-- [ ] Local cost scan from Codex/Claude JSONL logs (last 30 days)
-- [ ] Distribution as `.deb` (apt) + `.tar.gz` sidecar for Ubuntu 22.04+ / Debian 12+ on amd64
-- [ ] SHA-256 sidecar for each release artifact; GitHub Releases as the distribution channel
+- [x] CLI subcommand `codexbar usage -p <provider>` and `codexbar cost -p <provider>` for scripting / CI
+- [x] Codex CLI integration: spawn `codex` and parse local usage/cost from JSONL logs
+- [x] Claude / Gemini CLI fallback integration (parity with macOS PTY runner)
+- [x] Local cost scan from Codex/Claude JSONL logs (last 30 days)
+- [x] Distribution as `.deb` (apt) + `.tar.gz` sidecar for Ubuntu 22.04+ / Debian 12+ on amd64
+- [x] SHA-256 sidecar for each release artifact; GitHub Releases as the distribution channel
 
-### Deferred to v0.2.0 (Tauri tray + popover)
+### Active (v0.2.0-alpha — Tauri tray + popover)
 
 - [ ] Native Linux/Ubuntu tray indicator showing per-provider usage + reset countdown
 - [ ] Click-tray popover with provider grid, usage bars, reset times
-- [ ] Floating always-on-top usage bar (parity with Win-CodexBar Floating Bar)
-- [ ] Settings UI for managing provider credentials (API key, OAuth, browser cookie import)
-- [ ] Background polling cadence presets (manual, 1m, 2m, 5m, 15m)
-- [ ] Secure secret storage via libsecret (GNOME Keyring / KWallet via Secret Service API)
-- [ ] XDG autostart on login (.desktop file in `~/.config/autostart/`)
-- [ ] Global hotkey to toggle popover (best-effort under Wayland)
-- [ ] AppImage distribution (GUI-app packaging — meaningless without the Tauri shell)
-- [ ] Auto-update mechanism (Tauri built-in updater or custom apt repo)
-- [ ] Native-feel UI under GNOME (libadwaita styling) and KDE Plasma 5/6
-- [ ] Wayland + X11 dual support; graceful degradation when tray unavailable
+- [ ] Background poller (every 2 minutes) emitting `usage-updated` events to the frontend
+- [ ] Tray right-click menu: Refresh / Show window / Quit
+- [ ] Single-instance enforcement via `tauri-plugin-single-instance`
+- [ ] AppImage + `.deb` Tauri bundles produced by CI on `ubuntu-22.04`
 
 ### Deferred to v0.3.0
+
+- [ ] Settings UI for managing provider credentials (API key, OAuth, browser cookie import)
+- [ ] Secure secret storage via libsecret (GNOME Keyring / KWallet via Secret Service API)
+- [ ] XDG autostart on login (.desktop file in `~/.config/autostart/`)
+- [ ] Floating always-on-top usage bar (parity with Win-CodexBar Floating Bar)
+- [ ] Background polling cadence presets (manual, 1m, 2m, 5m, 15m)
+- [ ] Global hotkey to toggle popover (best-effort under Wayland)
+- [ ] Auto-update mechanism (Tauri built-in updater or custom apt repo)
+- [ ] Native-feel UI polish under GNOME (libadwaita styling) and KDE Plasma 5/6
+
+### Deferred to v0.4.0
 
 - [ ] Remaining ~36 providers from upstream Win-CodexBar (Cursor, Gemini, Mistral, etc.)
 
@@ -84,6 +89,7 @@ A glanceable Linux tray indicator that tells a developer *right now* how much of
 | **Alpha (v0.1.0) scope: 5 providers** — Codex, Claude, OpenAI CLI, Anthropic API (via `openaiapi/` shape), OpenRouter | Codex + Claude exercise the JSONL cost scanner; the other 3 exercise clean HTTP+rustls. 41 providers in v1 is fantasy; rest are tracked as v2. Forces every cross-cutting concern (auth, errors, parsing) through 5 distinct shapes, which is enough to harden the trait | — Locked 2026-05-17 |
 | MIT attribution preserved | Win-CodexBar is MIT-licensed; vendored source must retain original LICENSE alongside it (`crates/codexbar-core/LICENSE-WIN-CODEXBAR`) + top-level NOTICE crediting upstream | — Locked 2026-05-17 |
 | **v0.1.0-alpha = CLI-only (`.deb` + `.tar.gz`)** | Tauri shell + tray + popover is a multi-week build. Ship the CLI alpha tonight to validate the headless core in the wild, gather feedback on the 5-provider surface, then layer the GUI in v0.2.0. AppImage is deferred since it's a GUI-app format — `.tar.gz` is the idiomatic CLI sidecar. | — Locked 2026-05-17 |
+| **v0.2.0-alpha = Tauri tray + popover (read-only)** | Realignment after v0.1.0-alpha shipped: layer Tauri 2 tray + popover on top of the headless core *now*, before Settings UI. Read-only view of usage/cost is the minimum that earns a "this is a real app, not just a CLI" reaction. Settings/credential editing slides to v0.3.0. | — Locked 2026-05-17 |
 | Target Ubuntu 22.04 LTS + Debian 12 as v1 baseline | Covers ~80% of dev-Linux desktops; matches webkitgtk 6.0 floor; older distros routed to AppImage | — Pending |
 | `.deb` + AppImage for v1; Flatpak deferred | apt is idiomatic on Ubuntu; AppImage covers everything else; Flatpak adds portal/sandbox engineering cost we cannot absorb in v1 | — Pending |
 | Secret Service API for credentials, encrypted-file fallback | Standard freedesktop spec; works on GNOME Keyring + KWallet; encrypted fallback covers headless / unsupported sessions | — Pending |

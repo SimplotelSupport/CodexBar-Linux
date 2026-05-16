@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CodexBar</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <span class="logo" aria-hidden="true"></span>
+      <span class="title">CodexBar</span>
+    </div>
+    <div class="actions">
+      <button id="refresh" class="icon-btn" title="Refresh">↻</button>
+      <button id="hide" class="icon-btn" title="Hide">×</button>
+    </div>
+  </header>
+
+  <main id="main" class="grid">
+    <div id="empty" class="empty">Loading providers…</div>
+  </main>
+
+  <footer class="footer">
+    <span id="status" class="status">—</span>
+    <span class="version">v0.2.0-alpha</span>
+  </footer>
+
+  <template id="row-template">
+    <article class="provider">
+      <header class="prow">
+        <div class="pname"></div>
+        <div class="psource"></div>
+      </header>
+      <div class="account muted"></div>
+      <div class="bars"></div>
+      <div class="cost muted"></div>
+      <div class="error"></div>
+    </article>
+  </template>
+
+  <script type="module" src="app.js"></script>
+</body>
+</html>

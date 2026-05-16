@@ -1,9 +1,9 @@
 [workspace]
 resolver = "2"
-members = ["crates/codexbar-core"]
+members = ["crates/codexbar-core", "apps/desktop-tauri"]
 
 [workspace.package]
-version = "0.1.0-alpha"
+version = "0.2.0-alpha"
 edition = "2024"
 rust-version = "1.85"
 authors = ["sidhartha1s"]
