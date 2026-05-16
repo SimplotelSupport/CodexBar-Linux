@@ -127,17 +127,73 @@ Requirements for the initial public release on Ubuntu 22.04 LTS / Debian 12 / Fe
 
 ## Traceability
 
-Filled in by `gsd-roadmapper` when ROADMAP.md is created.
-
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| (populated by roadmapper) | | |
+| CORE-01 | Phase 0 | Pending |
+| CORE-02 | Phase 0 | Pending |
+| CORE-03 | Phase 0 | Pending |
+| CORE-04 | Phase 1 | Pending |
+| CORE-05 | Phase 1 | Pending |
+| CORE-06 | Phase 1 | Pending |
+| PROV-01 | Phase 1 | Pending |
+| PROV-02 | Phase 1 | Pending |
+| PROV-03 | Phase 1 | Pending |
+| PROV-04 | Phase 1 | Pending |
+| PROV-05 | Phase 1 | Pending |
+| PROV-06 | Phase 1 | Pending |
+| PROV-07 | Phase 1 | Pending |
+| PROV-08 | Phase 1 | Pending |
+| PROV-09 | Phase 1 | Pending |
+| PROV-10 | Phase 1 | Pending |
+| PROV-11 | Phase 1 | Pending |
+| PROV-12 | Phase 1 | Pending |
+| CLI-01 | Phase 1 | Pending |
+| CLI-02 | Phase 1 | Pending |
+| CLI-03 | Phase 1 | Pending |
+| CLI-04 | Phase 1 | Pending |
+| TEST-01 | Phase 1 | Pending |
+| TRAY-01 | Phase 2 | Pending |
+| TRAY-02 | Phase 2 | Pending |
+| TRAY-03 | Phase 2 | Pending |
+| TRAY-04 | Phase 2 | Pending |
+| TRAY-05 | Phase 2 | Pending |
+| TRAY-06 | Phase 2 | Pending |
+| TRAY-07 | Phase 2 | Pending |
+| TRAY-08 | Phase 2 | Pending |
+| TRAY-09 | Phase 2 | Pending |
+| LIFE-01 | Phase 2 | Pending |
+| LIFE-02 | Phase 2 | Pending |
+| SET-01 | Phase 3 | Pending |
+| SET-02 | Phase 3 | Pending |
+| SET-03 | Phase 3 | Pending |
+| SET-04 | Phase 3 | Pending |
+| SET-05 | Phase 3 | Pending |
+| SET-06 | Phase 3 | Pending |
+| SET-07 | Phase 3 | Pending |
+| SET-08 | Phase 3 | Pending |
+| LIFE-03 | Phase 3 | Pending |
+| LIFE-04 | Phase 3 | Pending |
+| TEST-02 | Phase 3 | Pending |
+| DIST-01 | Phase 4 | Pending |
+| DIST-02 | Phase 4 | Pending |
+| DIST-03 | Phase 4 | Pending |
+| DIST-04 | Phase 4 | Pending |
+| DIST-05 | Phase 4 | Pending |
+| DIST-06 | Phase 4 | Pending |
+| DIST-07 | Phase 4 | Pending |
+| TEST-03 | Phase 4 | Pending |
+| TEST-04 | Phase 4 | Pending |
+| TEST-05 | Phase 4 | Pending |
+| DOC-01 | Phase 4 | Pending |
+| DOC-02 | Phase 4 | Pending |
+| DOC-03 | Phase 4 | Pending |
+| DOC-04 | Phase 4 | Pending |
 
-**Coverage target:**
-- v1 requirements: 60 total
-- Mapped to phases: TBD by roadmapper
-- Unmapped: TBD ⚠️ (must be zero before ROADMAP.md is committed)
+**Coverage:**
+- v1 requirements: 59 total (corrected from initial 60 — count verified by enumeration)
+- Mapped to phases: 59/59
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-05-17*
-*Last updated: 2026-05-17 after initialization*
+*Last updated: 2026-05-17 — traceability table populated by gsd-roadmapper*
