@@ -26,7 +26,10 @@ fn version_flag_prints_semver() {
     );
     let s = String::from_utf8_lossy(&out.stdout);
     let expected = env!("CARGO_PKG_VERSION");
-    assert!(s.contains(expected), "got: {s}, expected version {expected}");
+    assert!(
+        s.contains(expected),
+        "got: {s}, expected version {expected}"
+    );
 }
 
 #[test]
