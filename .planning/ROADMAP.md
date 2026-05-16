@@ -2,7 +2,7 @@
 
 ## Overview
 
-CodexBar Linux is a platform port of the Windows Tauri/Rust port to Linux. The journey: resolve the Cargo feature-gate blocker (Phase 0), build and validate the headless CLI core with all providers (Phase 1), add the visible Tauri tray+popover shell (Phase 2), wire live data and credentials end-to-end (Phase 3), then package and ship a production release (Phase 4). Each phase delivers one coherent, testable capability before the next begins.
+CodexBar Linux is a platform port of the Windows Tauri/Rust port to Linux. The journey: resolve the Cargo feature-gate blocker (Phase 0), build and validate the headless CLI core with the 5 alpha providers (Phase 1), then package and ship the CLI-only **v0.1.0-alpha** (Phase 4-CLI: `.deb` + `.tar.gz` + SHA-256 on GitHub Releases). Phases 2 (Tauri shell + tray) and 3 (data pipeline + credentials) are deferred to **v0.2.0**. Each phase delivers one coherent, testable capability before the next begins.
 
 ## Phases
 
@@ -12,11 +12,12 @@ CodexBar Linux is a platform port of the Windows Tauri/Rust port to Linux. The j
 
 Decimal phases appear between their surrounding integers in numeric order.
 
-- [ ] **Phase 0: PRD & Foundation** - Resolve Cargo feature-gate blocker; establish headless-on-Linux workspace
-- [ ] **Phase 1: Headless Core + CLI (Dev)** - All providers compile and test green on Linux; CLI binary works standalone
-- [ ] **Phase 2: Tauri Shell + Tray (Dev)** - App launches; tray visible on GNOME + KDE; popover opens
-- [ ] **Phase 3: Data Pipeline + Credentials (Dev to Testing)** - Live usage data flows to popover; settings and Secret Service wired; CI integration tests green
-- [ ] **Phase 4: Distribution & Production Release** - `.deb` + AppImage built in CI; UAT complete; tagged GA release shipped
+- [x] **Phase 0: PRD & Foundation** - Resolve Cargo feature-gate blocker; establish headless-on-Linux workspace
+- [x] **Phase 1: Headless Core + CLI (Dev)** - All 5 alpha providers compile and test green on Linux; CLI binary works standalone
+- [ ] **Phase 4-CLI: Ship v0.1.0-alpha (CLI-only)** - `.deb` + `.tar.gz` + SHA-256 built in CI; tagged GitHub Release shipped
+- [ ] **Phase 2 (v0.2.0): Tauri Shell + Tray** - App launches; tray visible on GNOME + KDE; popover opens
+- [ ] **Phase 3 (v0.2.0): Data Pipeline + Credentials** - Live usage data flows to popover; settings and Secret Service wired; CI integration tests green
+- [ ] **Phase 4-GUI (v0.2.0): GUI distribution** - AppImage + `.deb` GUI build; UAT complete; tagged v0.2.0 release shipped
 
 ## Phase Details
 
@@ -69,10 +70,21 @@ Decimal phases appear between their surrounding integers in numeric order.
 **Plans**: TBD
 **UI hint**: yes
 
-### Phase 4: Distribution & Production Release
-**Goal**: `.deb` and AppImage artifacts are built in CI, pass install/uninstall smoke tests, and a tagged GA release is published on GitHub Releases
+### Phase 4-CLI: Ship v0.1.0-alpha (CLI-only)
+**Goal**: `.deb` + `.tar.gz` artifacts for the `codexbar` CLI are built in CI on `ubuntu-22.04`, attached to a tagged GitHub Release with SHA-256 sidecars
+**Depends on**: Phase 1
+**Requirements**: DIST-01 (CLI subset), DIST-04, DIST-07
+**Success Criteria** (what must be TRUE):
+  1. `.github/workflows/release.yml` triggers on tag push matching `v*-alpha` / `v*` and runs `cargo build --release`, `cargo deb`, and `tar czf` on `ubuntu-22.04`
+  2. Release artifacts include: `codexbar_<version>_amd64.deb`, `codexbar-<version>-linux-amd64.tar.gz`, and `*.sha256` sidecars for both
+  3. Local smoke test against `target/release/codexbar`: `--version` prints semver, `--help` lists 5 subcommands and 5 providers, all 3 integration smoke tests pass
+  4. Repo `sidhartha1s/CodexBar-Linux` exists on GitHub, public, with `main` branch pushed; `v0.1.0-alpha` tag triggers the release workflow
+**Plans**: TBD
+
+### Phase 4-GUI: Distribution & GA Release (v0.2.0, deferred)
+**Goal**: `.deb` + AppImage artifacts for the Tauri GUI app are built in CI, pass install/uninstall smoke tests, and a v0.2.0 GA release is published
 **Depends on**: Phase 3
-**Requirements**: DIST-01, DIST-02, DIST-03, DIST-04, DIST-05, DIST-06, DIST-07, TEST-03, TEST-04, TEST-05, DOC-01, DOC-02, DOC-03, DOC-04
+**Requirements**: DIST-01, DIST-02, DIST-03, DIST-05, DIST-06, TEST-03, TEST-04, TEST-05, DOC-01, DOC-02, DOC-03, DOC-04
 **Success Criteria** (what must be TRUE):
   1. GitHub Actions produces `.deb` and AppImage artifacts on every push to `main` (no manual packaging step)
   2. `dpkg -I codexbar.deb` shows `libwebkit2gtk-4.1-0`, `libgtk-3-0`, `libayatana-appindicator3-1` as runtime deps

@@ -16,24 +16,33 @@ A glanceable Linux tray indicator that tells a developer *right now* how much of
 
 (None yet — ship to validate)
 
-### Active
+### Active (v0.1.0-alpha — CLI-only cut)
+
+- [ ] CLI subcommand `codexbar usage -p <provider>` and `codexbar cost -p <provider>` for scripting / CI
+- [ ] Codex CLI integration: spawn `codex` and parse local usage/cost from JSONL logs
+- [ ] Claude / Gemini CLI fallback integration (parity with macOS PTY runner)
+- [ ] Local cost scan from Codex/Claude JSONL logs (last 30 days)
+- [ ] Distribution as `.deb` (apt) + `.tar.gz` sidecar for Ubuntu 22.04+ / Debian 12+ on amd64
+- [ ] SHA-256 sidecar for each release artifact; GitHub Releases as the distribution channel
+
+### Deferred to v0.2.0 (Tauri tray + popover)
 
 - [ ] Native Linux/Ubuntu tray indicator showing per-provider usage + reset countdown
 - [ ] Click-tray popover with provider grid, usage bars, reset times
 - [ ] Floating always-on-top usage bar (parity with Win-CodexBar Floating Bar)
 - [ ] Settings UI for managing provider credentials (API key, OAuth, browser cookie import)
 - [ ] Background polling cadence presets (manual, 1m, 2m, 5m, 15m)
-- [ ] Codex CLI integration: spawn `codex` and parse local usage/cost from JSONL logs
-- [ ] Claude / Gemini CLI fallback integration (parity with macOS PTY runner)
 - [ ] Secure secret storage via libsecret (GNOME Keyring / KWallet via Secret Service API)
 - [ ] XDG autostart on login (.desktop file in `~/.config/autostart/`)
 - [ ] Global hotkey to toggle popover (best-effort under Wayland)
-- [ ] Local cost scan from Codex/Claude JSONL logs (last 30 days)
-- [ ] Distribution as `.deb` (apt) and `AppImage` for Ubuntu 22.04+ / Debian 12+
+- [ ] AppImage distribution (GUI-app packaging — meaningless without the Tauri shell)
 - [ ] Auto-update mechanism (Tauri built-in updater or custom apt repo)
-- [ ] CLI subcommand `codexbar usage -p <provider>` and `codexbar cost -p <provider>` for scripting / CI
 - [ ] Native-feel UI under GNOME (libadwaita styling) and KDE Plasma 5/6
 - [ ] Wayland + X11 dual support; graceful degradation when tray unavailable
+
+### Deferred to v0.3.0
+
+- [ ] Remaining ~36 providers from upstream Win-CodexBar (Cursor, Gemini, Mistral, etc.)
 
 ### Out of Scope
 
@@ -74,6 +83,7 @@ A glanceable Linux tray indicator that tells a developer *right now* how much of
 | **Selectively vendor headless modules from Win-CodexBar (not fork-and-feature-gate)** | Win-CodexBar's `codexbar` crate has GUI deps as unconditional `[dependencies]` (winit, eframe, tray-icon, muda, global-hotkey, keyring, aes-gcm). Feature-gating means modifying upstream; selective vendor = delete what we don't need, keep MIT attribution, zero GUI baggage. Cleaner than carrying a fork in lockstep. | — Locked 2026-05-17 |
 | **Alpha (v0.1.0) scope: 5 providers** — Codex, Claude, OpenAI CLI, Anthropic API (via `openaiapi/` shape), OpenRouter | Codex + Claude exercise the JSONL cost scanner; the other 3 exercise clean HTTP+rustls. 41 providers in v1 is fantasy; rest are tracked as v2. Forces every cross-cutting concern (auth, errors, parsing) through 5 distinct shapes, which is enough to harden the trait | — Locked 2026-05-17 |
 | MIT attribution preserved | Win-CodexBar is MIT-licensed; vendored source must retain original LICENSE alongside it (`crates/codexbar-core/LICENSE-WIN-CODEXBAR`) + top-level NOTICE crediting upstream | — Locked 2026-05-17 |
+| **v0.1.0-alpha = CLI-only (`.deb` + `.tar.gz`)** | Tauri shell + tray + popover is a multi-week build. Ship the CLI alpha tonight to validate the headless core in the wild, gather feedback on the 5-provider surface, then layer the GUI in v0.2.0. AppImage is deferred since it's a GUI-app format — `.tar.gz` is the idiomatic CLI sidecar. | — Locked 2026-05-17 |
 | Target Ubuntu 22.04 LTS + Debian 12 as v1 baseline | Covers ~80% of dev-Linux desktops; matches webkitgtk 6.0 floor; older distros routed to AppImage | — Pending |
 | `.deb` + AppImage for v1; Flatpak deferred | apt is idiomatic on Ubuntu; AppImage covers everything else; Flatpak adds portal/sandbox engineering cost we cannot absorb in v1 | — Pending |
 | Secret Service API for credentials, encrypted-file fallback | Standard freedesktop spec; works on GNOME Keyring + KWallet; encrypted fallback covers headless / unsupported sessions | — Pending |
@@ -98,4 +108,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-05-16 after initialization*
+*Last updated: 2026-05-17 — scope cut to v0.1.0-alpha = CLI-only; Tauri shell deferred to v0.2.0*
