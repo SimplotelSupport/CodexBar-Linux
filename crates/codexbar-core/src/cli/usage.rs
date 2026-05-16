@@ -8,7 +8,8 @@ use crate::core::{
 };
 use crate::status::{ProviderStatus as StatusInfo, StatusLevel, fetch_provider_status};
 
-pub const PROVIDER_ARG_HELP: &str = "Provider to query (codex, claude, copilot, openaiapi, openrouter, all, both)";
+pub const PROVIDER_ARG_HELP: &str =
+    "Provider to query (codex, claude, copilot, openaiapi, openrouter, all, both)";
 
 /// Arguments for the usage command
 #[derive(Args, Debug, Default)]

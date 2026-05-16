@@ -1,0 +1,112 @@
+name: release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  build:
+    name: build artifacts (ubuntu-22.04)
+    runs-on: ubuntu-22.04
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Rust toolchain (stable)
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache cargo
+        uses: Swatinem/rust-cache@v2
+
+      - name: Install cargo-deb
+        run: cargo install cargo-deb --locked --version ^2
+
+      - name: Resolve version
+        id: version
+        run: |
+          VERSION="${GITHUB_REF_NAME#v}"
+          echo "version=${VERSION}" >> "$GITHUB_OUTPUT"
+          echo "Building release for ${VERSION}"
+
+      - name: cargo build --release
+        run: cargo build --release -p codexbar-core
+
+      - name: Smoke test release binary
+        run: |
+          ./target/release/codexbar --version
+          ./target/release/codexbar --help | head -20
+          ./target/release/codexbar usage --help | grep -q openrouter
+
+      - name: cargo test --release
+        run: cargo test --release --workspace
+
+      - name: Build .deb
+        run: cargo deb -p codexbar-core --no-build --output target/debian/
+
+      - name: Build tarball
+        run: |
+          VERSION="${{ steps.version.outputs.version }}"
+          STAGE="codexbar-${VERSION}-linux-amd64"
+          mkdir -p "dist/${STAGE}"
+          cp target/release/codexbar "dist/${STAGE}/"
+          cp README.md LICENSE NOTICE "dist/${STAGE}/"
+          cp crates/codexbar-core/LICENSE-WIN-CODEXBAR "dist/${STAGE}/" || true
+          tar -C dist -czf "dist/${STAGE}.tar.gz" "${STAGE}"
+          ls -la dist/
+
+      - name: Generate SHA-256 sidecars
+        run: |
+          set -euo pipefail
+          mkdir -p artifacts
+          for f in target/debian/*.deb dist/*.tar.gz; do
+            cp "$f" artifacts/
+          done
+          cd artifacts
+          for f in *.deb *.tar.gz; do
+            sha256sum "$f" > "${f}.sha256"
+          done
+          ls -la
+
+      - name: Upload artifacts (for inspection)
+        uses: actions/upload-artifact@v4
+        with:
+          name: codexbar-linux-amd64
+          path: artifacts/
+          if-no-files-found: error
+
+  release:
+    name: publish GitHub Release
+    needs: build
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: codexbar-linux-amd64
+          path: artifacts/
+
+      - name: Publish release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          TAG="${GITHUB_REF_NAME}"
+          IS_PRE=""
+          if [[ "${TAG}" == *"-alpha"* || "${TAG}" == *"-beta"* || "${TAG}" == *"-rc"* ]]; then
+            IS_PRE="--prerelease"
+          fi
+          gh release create "${TAG}" \
+            --title "${TAG}" \
+            --generate-notes \
+            ${IS_PRE} \
+            artifacts/*

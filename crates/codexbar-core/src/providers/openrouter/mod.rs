@@ -6,11 +6,11 @@
 use async_trait::async_trait;
 use serde::Deserialize;
 
-use crate::keyring;
 use crate::core::{
     FetchContext, Provider, ProviderError, ProviderFetchResult, ProviderId, ProviderMetadata,
     RateWindow, SourceMode, UsageSnapshot,
 };
+use crate::keyring;
 
 /// OpenRouter API base URL
 const OPENROUTER_API_BASE: &str = "https://openrouter.ai/api/v1/auth";

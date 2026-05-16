@@ -19,7 +19,11 @@ fn version_flag_prints_semver() {
         .arg("--version")
         .output()
         .expect("spawn codexbar");
-    assert!(out.status.success(), "stderr: {}", String::from_utf8_lossy(&out.stderr));
+    assert!(
+        out.status.success(),
+        "stderr: {}",
+        String::from_utf8_lossy(&out.stderr)
+    );
     let s = String::from_utf8_lossy(&out.stdout);
     assert!(s.contains("0.1.0-alpha"), "got: {s}");
 }

@@ -15,6 +15,24 @@ path = "src/lib.rs"
 name = "codexbar"
 path = "src/bin/codexbar.rs"
 
+[package.metadata.deb]
+name = "codexbar"
+maintainer = "sidhartha1s <sidhartha1s@users.noreply.github.com>"
+copyright = "2026 sidhartha1s; portions 2024-2025 Win-CodexBar contributors (MIT)"
+license-file = ["../../LICENSE", "0"]
+extended-description = """\
+Headless CLI that surfaces real-time AI coding-provider usage limits, \
+quota reset countdowns, and cumulative cost across Codex, Claude, GitHub \
+Copilot, OpenAI API, and OpenRouter. Linux/Ubuntu port of CodexBar."""
+section = "utils"
+priority = "optional"
+assets = [
+    ["target/release/codexbar", "usr/bin/", "755"],
+    ["../../README.md", "usr/share/doc/codexbar/README.md", "644"],
+    ["../../LICENSE", "usr/share/doc/codexbar/LICENSE", "644"],
+    ["../../NOTICE", "usr/share/doc/codexbar/NOTICE", "644"],
+]
+
 [features]
 default = []
 

@@ -7,11 +7,11 @@ use chrono::{DateTime, TimeZone, Utc};
 use reqwest::Client;
 use serde::Deserialize;
 
-use crate::keyring;
 use crate::core::{
     CostSnapshot, FetchContext, Provider, ProviderError, ProviderFetchResult, ProviderId,
     ProviderMetadata, RateWindow, SourceMode, UsageSnapshot,
 };
+use crate::keyring;
 
 const OPENAI_CREDIT_GRANTS_URL: &str = "https://api.openai.com/v1/dashboard/billing/credit_grants";
 const OPENAI_API_CREDENTIAL_TARGET: &str = "codexbar-openaiapi";

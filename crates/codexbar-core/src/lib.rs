@@ -7,8 +7,8 @@
 
 pub mod cli;
 pub mod core;
-pub mod keyring;
 pub mod cost_scanner;
+pub mod keyring;
 pub mod logging;
 pub mod providers;
 pub mod secure_file;
