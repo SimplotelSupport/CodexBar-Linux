@@ -7,9 +7,9 @@ A native Linux/Ubuntu port of [steipete/CodexBar](https://github.com/steipete/Co
 
 CodexBar surfaces real-time AI coding-provider usage limits, quota reset countdowns, and cumulative cost — so you can see exactly how much of your AI budget remains without opening a browser.
 
-## Status: v0.2.0-alpha (Tauri tray + popover)
+## Status: v0.2.0-alpha.3 (Tauri tray + popover, credential-wired)
 
-v0.2.0-alpha ships **both**:
+v0.2.0-alpha.3 ships **both**:
 
 - **`CodexBar`** — Tauri tray app with a popover that shows per-provider usage bars, reset countdowns, and cumulative cost. StatusNotifierItem + libayatana-appindicator3. Background poller refreshes every 2 minutes.
 - **`codexbar`** — headless CLI from v0.1.0-alpha, unchanged: `codexbar usage`, `codexbar cost`, `codexbar config`, etc.
@@ -22,9 +22,8 @@ v0.2.0-alpha ships **both**:
 ### Desktop app (.deb — recommended)
 
 ```bash
-# Pick whichever .deb appears under Releases (filename varies with version)
-curl -LO https://github.com/sidhartha1s/CodexBar-Linux/releases/latest/download/CodexBar_0.2.0-alpha_amd64.deb
-sudo dpkg -i CodexBar_0.2.0-alpha_amd64.deb
+curl -LO https://github.com/sidhartha1s/CodexBar-Linux/releases/latest/download/CodexBar_0.2.0-alpha.3_amd64.deb
+sudo dpkg -i CodexBar_0.2.0-alpha.3_amd64.deb
 sudo apt -f install   # auto-installs missing runtime deps if any
 codexbar-desktop &    # launches into tray
 ```
@@ -32,7 +31,7 @@ codexbar-desktop &    # launches into tray
 ### Desktop app (AppImage)
 
 ```bash
-curl -LO https://github.com/sidhartha1s/CodexBar-Linux/releases/latest/download/CodexBar_0.2.0-alpha_amd64.AppImage
+curl -LO https://github.com/sidhartha1s/CodexBar-Linux/releases/latest/download/CodexBar_0.2.0-alpha.3_amd64.AppImage
 chmod +x CodexBar_*.AppImage
 ./CodexBar_*.AppImage
 ```
@@ -40,15 +39,15 @@ chmod +x CodexBar_*.AppImage
 ### CLI only (.deb)
 
 ```bash
-curl -LO https://github.com/sidhartha1s/CodexBar-Linux/releases/latest/download/codexbar_0.2.0-alpha-1_amd64.deb
-sudo dpkg -i codexbar_0.2.0-alpha-1_amd64.deb
+curl -LO https://github.com/sidhartha1s/CodexBar-Linux/releases/latest/download/codexbar_0.2.0.alpha.3-1_amd64.deb
+sudo dpkg -i codexbar_0.2.0.alpha.3-1_amd64.deb
 ```
 
 ### CLI tarball (any glibc-2.35+ Linux on amd64)
 
 ```bash
-curl -L https://github.com/sidhartha1s/CodexBar-Linux/releases/latest/download/codexbar-0.2.0-alpha-linux-amd64.tar.gz | tar xz
-sudo install -m 0755 codexbar-0.2.0-alpha-linux-amd64/codexbar /usr/local/bin/
+curl -L https://github.com/sidhartha1s/CodexBar-Linux/releases/latest/download/codexbar-0.2.0-alpha.3-linux-amd64.tar.gz | tar xz
+sudo install -m 0755 codexbar-0.2.0-alpha.3-linux-amd64/codexbar /usr/local/bin/
 ```
 
 Verify integrity with the published `.sha256` sidecars.
@@ -69,6 +68,31 @@ codexbar usage -p codex --json
 codexbar cost -p claude
 codexbar cost -p codex
 ```
+
+### Storing provider credentials (v0.2.0-alpha.3+)
+
+The desktop popover and CLI both read tokens from `~/.codexbar/token-accounts.json` (managed via the `codexbar account` subcommands — no plaintext editing required):
+
+```bash
+# GitHub Personal Access Token (for Copilot usage)
+codexbar account add --provider copilot --label main --token <github-pat>
+
+# OpenRouter API key
+codexbar account add --provider openrouter --label main --token sk-or-...
+
+# OpenAI API key
+codexbar account add --provider openaiapi --label main --token sk-...
+
+# Claude session cookie (paste full Cookie: header value)
+codexbar account add --provider claude --label main --token 'sessionKey=...'
+
+# Inspect / switch / remove
+codexbar account list --provider openrouter
+codexbar account switch --provider openrouter --label backup
+codexbar account remove --provider openrouter --label main
+```
+
+The desktop popover picks up new credentials on its next 2-minute poll (or hit ↻ in the tray). Codex needs no token — it probes the local `codex` CLI binary directly. v0.3.0 will migrate this store onto the Secret Service via `oo7`.
 
 ## Build from source
 
@@ -104,6 +128,6 @@ MIT. Headless modules and the 5 alpha providers are selectively vendored from [F
 ## Roadmap
 
 - **v0.1.0-alpha** — headless CLI, 5 providers, `.deb` + `.tar.gz`
-- **v0.2.0-alpha** (this release) — Tauri tray + popover with live provider grid + background poller
+- **v0.2.0-alpha.3** (this release) — Tauri tray + popover with live provider grid + background poller; credentials loaded from `~/.codexbar/token-accounts.json`
 - **v0.3.0** — Settings UI with credential editing, Secret Service (`oo7`) keyring, autostart polish
 - **v0.4.0** — remaining ~36 providers from upstream Win-CodexBar
