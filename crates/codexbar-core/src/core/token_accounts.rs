@@ -20,6 +20,8 @@ pub enum TokenInjection {
     CookieHeader,
     /// Inject as environment variable
     Environment { key: String },
+    /// Inject as API key (passed through `FetchContext::api_key`)
+    ApiKey,
 }
 
 /// Support definition for a provider's token accounts
@@ -157,11 +159,34 @@ impl TokenAccountSupport {
                 requires_manual_cookie_source: true,
                 cookie_name: Some("__Secure-better-auth.session_token"),
             }),
+            ProviderId::OpenRouter => Some(TokenAccountSupport {
+                title: "API tokens",
+                subtitle: "Store OpenRouter API keys (sk-or-...). Loaded into ctx.api_key at fetch time.",
+                placeholder: "sk-or-...",
+                injection: TokenInjection::ApiKey,
+                requires_manual_cookie_source: false,
+                cookie_name: None,
+            }),
+            ProviderId::OpenAIApi => Some(TokenAccountSupport {
+                title: "API tokens",
+                subtitle: "Store OpenAI API keys (sk-...). Loaded into ctx.api_key at fetch time.",
+                placeholder: "sk-...",
+                injection: TokenInjection::ApiKey,
+                requires_manual_cookie_source: false,
+                cookie_name: None,
+            }),
+            ProviderId::Copilot => Some(TokenAccountSupport {
+                title: "API tokens",
+                subtitle: "Store a GitHub Personal Access Token with Copilot access.",
+                placeholder: "ghp_... or github_pat_...",
+                injection: TokenInjection::ApiKey,
+                requires_manual_cookie_source: false,
+                cookie_name: None,
+            }),
             // These providers don't support token accounts
             ProviderId::Codex
             | ProviderId::Gemini
             | ProviderId::Antigravity
-            | ProviderId::Copilot
             | ProviderId::Kiro
             | ProviderId::VertexAI
             | ProviderId::Kimi
@@ -169,7 +194,6 @@ impl TokenAccountSupport {
             | ProviderId::Synthetic
             | ProviderId::JetBrains
             | ProviderId::Warp
-            | ProviderId::OpenRouter
             | ProviderId::NanoGPT
             | ProviderId::Infini
             | ProviderId::Perplexity
@@ -183,8 +207,7 @@ impl TokenAccountSupport {
             | ProviderId::Doubao
             | ProviderId::Crof
             | ProviderId::StepFun
-            | ProviderId::Venice
-            | ProviderId::OpenAIApi => None,
+            | ProviderId::Venice => None,
         }
     }
 
@@ -214,6 +237,9 @@ impl TokenAccountSupport {
                 }
                 None
             }
+            // ApiKey tokens are threaded through FetchContext::api_key at call
+            // time, not via a child-process env var.
+            TokenInjection::ApiKey => None,
         }
     }
 
