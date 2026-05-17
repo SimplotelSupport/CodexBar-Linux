@@ -1,7 +1,9 @@
 use std::sync::Mutex;
 use std::time::Duration;
 
-use codexbar_core::core::{FetchContext, ProviderId, SourceMode, instantiate_provider};
+use codexbar_core::core::{
+    FetchContext, ProviderId, SourceMode, TokenAccountStore, instantiate_provider,
+};
 use serde::Serialize;
 use tauri::{
     AppHandle, Emitter, Manager,
@@ -50,13 +52,24 @@ const ALPHA_PROVIDERS: &[ProviderId] = &[
 async fn fetch_one(id: ProviderId) -> ProviderRow {
     let provider = instantiate_provider(id);
     let meta = provider.metadata().clone();
+
+    let stored_token = TokenAccountStore::new()
+        .load_provider(id)
+        .ok()
+        .and_then(|data| data.active_account().map(|a| a.token.clone()));
+
+    let (manual_cookie_header, api_key) = match id {
+        ProviderId::Claude => (stored_token, None),
+        _ => (None, stored_token),
+    };
+
     let ctx = FetchContext {
         source_mode: SourceMode::Auto,
         include_credits: true,
         web_timeout: 30,
         verbose: false,
-        manual_cookie_header: None,
-        api_key: None,
+        manual_cookie_header,
+        api_key,
     };
 
     match provider.fetch_usage(&ctx).await {

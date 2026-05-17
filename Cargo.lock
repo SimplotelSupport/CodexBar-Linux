@@ -635,6 +635,7 @@ version = "0.2.0-alpha"
 dependencies = [
  "anyhow",
  "codexbar-core",
+ "futures",
  "serde",
  "serde_json",
  "tauri",

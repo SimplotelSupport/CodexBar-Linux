@@ -103,7 +103,7 @@ impl CopilotApi {
 
         // If no token found, return error with instructions
         Err(ProviderError::NotInstalled(
-            "GitHub token not found. Store a GitHub Personal Access Token in Windows Credential Manager with target 'codexbar-copilot'.".to_string()
+            "GitHub token not found. Run `codexbar account add --provider copilot --label main --token <github-pat>` to store a GitHub Personal Access Token.".to_string()
         ))
     }
 
